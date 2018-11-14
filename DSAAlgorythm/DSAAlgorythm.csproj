@@ -41,10 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorythms\DSASigning.cs" />
-    <Compile Include="Algorythms\DSAVeryfing.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="BigInt.cs" />
+    <Compile Include="DoubleWordsCollection.cs" />
+    <Compile Include="DoubleWordsListExtensions.cs" />
+    <Compile Include="DSAAlgorythm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Signature.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Algorythms\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
