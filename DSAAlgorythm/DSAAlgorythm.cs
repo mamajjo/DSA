@@ -16,6 +16,7 @@ namespace DSAAlgorythm
         public BigInteger K { get; set; }
         public BigInteger PrivateKey { get; set; }
         public BigInteger PublicKey { get; set; }
+        public BigInteger UserPublicKey { get; set; }
         public BigInteger Hash { get; set; }
         private IDataProvider Data { get; }
         public byte[] BytesMessage { get; set; }
@@ -31,14 +32,33 @@ namespace DSAAlgorythm
 
         public Signature Signing()
         {
-            //R = (Math.Pow(G, K) % P) % Q;
+            R = (G.ModPow(K, P)) % Q;
             // TODO power operation
-            S = [(Math.Pow(K, -1.0) * (Hash + PrivateKey * r))] % Q;
-            // TODO revert BigInt Operation
-            return new null;
+            var reverseHelperBI = new BigInteger(1);
+            S = [reverseHelperBI/K * (Hash + PrivateKey * R)] % Q;
+            return new Signature(R,S);
         }
 
-        public Verifying(Signature signature, )
+        public bool Verifying(Signature signature)
+        {
+            var reverseHelperBI = new BigInteger(1);
+            BigInteger sPrime = reverseHelperBI / signature.S; 
+            BigInteger w = sPrime % Q;
+            BigInteger a = Hash.ModPow(w, Q);
+            BigInteger rPrime = R * w;
+            BigInteger b = rPrime % Q;
+            //(A * B) mod C = (A mod C * B mod C) mod C
+            //g^a * y^b) % p )%g
+            BigInteger v = ((G.ModPow(a, P) * UserPublicKey.ModPow(b, P)) % P) % Q;
+            if ( v == R)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
 
     }
