@@ -4,6 +4,6 @@ namespace DSAAlgorythm.Services
 {
     public static class CryptoRandomNumberProvider
     {
-        public static RNGCryptoServiceProvider RndProvide = new RNGCryptoServiceProvider();
+        public static RNGCryptoServiceProvider RndProvider = new RNGCryptoServiceProvider();
     }
 }

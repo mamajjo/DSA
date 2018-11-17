@@ -2,12 +2,12 @@
 
 namespace DSAAlgorythm.Model
 {
-    public class KeyPair
+    public class UserKeyPair
     {
         public BigInteger PrivateKey { get; }
         public BigInteger PublicKey { get; }
 
-        public KeyPair(BigInteger privateKey, BigInteger publicKey)
+        public UserKeyPair(BigInteger privateKey, BigInteger publicKey)
         {
             PrivateKey = privateKey;
             PublicKey = publicKey;
