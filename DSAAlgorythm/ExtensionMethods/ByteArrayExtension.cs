@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace DSAAlgorythm.ExtensionMethods
 {
@@ -17,6 +18,18 @@ namespace DSAAlgorythm.ExtensionMethods
             }
 
             return xorResult;
+        }
+
+        public static BigInteger CreatePositiveBigInteger(this byte[] data)
+        {
+            int byteCount = data.Length;
+
+            if ((data[byteCount - 1] & 0x80) != 0x80) return new BigInteger(data);
+
+            // the most sgnificant bit is 1, number is negative
+            byte[] positive = new byte[byteCount + 1];
+            data.CopyTo(positive, 0);
+            return new BigInteger(positive);
         }
     }
 }

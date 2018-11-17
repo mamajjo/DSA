@@ -4,6 +4,6 @@ namespace DSAAlgorythm.Services.Interface
 {
     public interface IPrimalityTester
     {
-        bool CheckPrimality(BigInteger possiblePrime);
+        bool CheckPrimality(BigInteger p);
     }
 }

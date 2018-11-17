@@ -13,44 +13,43 @@ namespace DSAAlgorythm.Services
             _confidence = confidence;
         }
 
-        public bool CheckPrimality(BigInteger n)
+        public bool CheckPrimality(BigInteger p)
         {
             //handle cases < 4 and even numbers
-            if (n == 2 || n == 3)
+            if (p == 2 || p == 3)
                 return true;
-            if (n < 2 || n.IsEven)
+            if (p < 2 || p.IsEven)
                 return false;
 
-            BigInteger nm1 = n - 1;
+            BigInteger pSub1 = p - 1;
             int s = 0;
 
-            while (nm1 % 2 == 0)
+            while (pSub1 % 2 == 0)
             {
-                nm1 /= 2;
+                pSub1 /= 2;
                 s += 1;
             }
 
-            int bytesLength = n.ToByteArray().Length;
+            int bytesLength = p.ToByteArray().Length;
 
             for (int i = 0; i < _confidence; i++)
             {
+                BigInteger a = GenerateRandomNumber(2, p - 1, bytesLength);
 
-                BigInteger a = GenerateRandomNumber(2, n - 1, bytesLength);
-
-                BigInteger x = BigInteger.ModPow(a, nm1, n);
-                if (x == 1 || x == n - 1)
+                BigInteger x = BigInteger.ModPow(a, pSub1, p);
+                if (x == 1 || x == p - 1)
                     continue;
 
                 for (int r = 1; r < s; r++)
                 {
-                    x = BigInteger.ModPow(x, 2, n);
+                    x = BigInteger.ModPow(x, 2, p);
                     if (x == 1)
                         return false;
-                    if (x == n - 1)
+                    if (x == p - 1)
                         break;
                 }
 
-                if (x != n - 1)
+                if (x != p - 1)
                     return false;
             }
 

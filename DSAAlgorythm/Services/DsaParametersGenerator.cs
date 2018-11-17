@@ -9,155 +9,127 @@ namespace DSAAlgorythm.Services
 {
     public class DsaParametersGenerator
     {
-        private static RNGCryptoServiceProvider _rndProvider = new RNGCryptoServiceProvider();
-        private IPrimalityTester _primalityTester = new MillerRabinPrimalityTester(20);
+        private static readonly RNGCryptoServiceProvider RndProvider = new RNGCryptoServiceProvider();
+        private readonly IPrimalityTester _primalityTester = new MillerRabinPrimalityTester(40);
 
-        public DsaSystemParameters GenerateParameters(int N, int L, int seedlen)
+        public DsaSystemParameters GenerateParameters(int L, int N, int seedLen)
         {
-            //N and L have to be acceptable
+            #region CONDITIONS
 
-            if (seedlen < N)
-                throw new ArgumentException("Seedlen cannot be less then N");
-
+            //SHA-1 used
             //Bit length of the output block of choosen hash function, shall be equal to or greater than N
             int outlen = 160;
-            BigInteger outlenPow = BigInteger.Pow(2, seedlen);
 
+            // check combination support
+            if(!CheckLengthCombinations(L, N))
+                throw new ArgumentException($"Combination of lengths: L={L} and N={N} is not supported");
+            
+            if(outlen < N) 
+                throw new ArgumentException("Outlen cannot be less than N");
 
+            // insisted by FIPS standard
+            if (seedLen < N)
+                throw new ArgumentException("Seedlen cannot be less then N");
+
+            #endregion
+
+            // calculate equation parameters L - 1 = n * 160(outlen) + b
             int n = (int)Math.Ceiling((double)L / outlen) - 1;
-
             int b = L - 1 - (n * outlen);
 
-            int remainingBits = seedlen % 8;
-            byte[] domain_parameter_seed;
-            if (remainingBits == 0)
-            {
-                domain_parameter_seed = new byte[seedlen / 8];
-            }
-            else
-            {
-                domain_parameter_seed = new byte[(seedlen / 8) + 1];
-            }
+            // create container for seed
+            int remainingBits = seedLen % 8;
+            byte[] seed = new byte[(seedLen/8) + (remainingBits == 0 ? 0 : 1)];
 
-            BigInteger q;
+            BigInteger outlenPow = BigInteger.Pow(2, seedLen);
+            BigInteger p, q;
 
-            bool backToStep1 = true;
-            bool backToStep7 = true;
-
+            bool outerLoop = true;
             do
             {
-                do
-                {
-                    q = SetQ(outlenPow, remainingBits, domain_parameter_seed);
+                q = GenerateQ(outlenPow, remainingBits, seed);
 
-                } while (_primalityTester.CheckPrimality(q));
-
+                bool innerLoop = true;
                 int counter = 0, offset = 2;
                 do
                 {
-                    BigInteger p = SetP(L, outlen, outlenPow, n, b, domain_parameter_seed, q, ref counter, ref offset);
+                    p = GenerateP(L, outlen, outlenPow, n, b, seed, q, ref offset);
 
                     if (p < BigInteger.Pow(2, L - 1))
                     {
-                        counter++;
-                        offset = offset + n + 1;
-                        if (counter == 4096)
-                        {
-                            backToStep1 = true;
-                            backToStep7 = false;
-                        }
-                        else
-                        {
-                            backToStep1 = false;
-                            backToStep7 = true;
-                        }
+                        UpdateControlVariables(n, ref outerLoop, ref innerLoop, ref counter, ref offset);
                     }
                     else
                     {
                         if (_primalityTester.CheckPrimality(p))
                         {
-                            return new KeyPair() { p = p, q = q };
+                            outerLoop = false;
+                            innerLoop = false;
                         }
                         else
                         {
-                            counter++;
-                            offset = offset + n + 1;
-                            if (counter == 4096)
-                            {
-                                backToStep1 = true;
-                                backToStep7 = false;
-                            }
-                            else
-                            {
-                                backToStep1 = false;
-                                backToStep7 = true;
-                            }
+                            UpdateControlVariables(n, ref outerLoop, ref innerLoop, ref counter, ref offset);
                         }
                     }
-                } while (backToStep7);
+                } while (innerLoop);
 
-            } while (backToStep1);
+            } while (outerLoop || (p-1) % q != 0);
 
-            return null;
+            BigInteger g = GenerateG(p, q);
 
-            //BigInteger domain_parameter_seed = new BigInteger();
+            return new DsaSystemParameters(p, q, g);
         }
 
-        private BigInteger SetQ(BigInteger outlenPow, int remainingBits, byte[] domain_parameter_seed)
+        private BigInteger GenerateQ(BigInteger outlenPow, int remainingBits, byte[] seed)
         {
             BigInteger q;
-            _rndProvider.GetBytes(domain_parameter_seed);
-
-            if (remainingBits > 0)
+            do
             {
-                byte mask = 0;
-                for (int i = 0; i < remainingBits; i++)
+                RndProvider.GetBytes(seed);
+
+                // turn off additional bits and set the most significant bit to 1
+                if (remainingBits > 0)
                 {
-                    mask |= (byte)(1 << i);
+                    byte mask = (byte)(0xFF >> (8 - remainingBits));
+                    seed[seed.Length - 1] &= mask;
+                    seed[seed.Length - 1] |= (byte)(1 << (remainingBits-1));
+                }
+                else
+                {
+                    seed[seed.Length - 1] |= (byte) (1 << 7);
                 }
 
-                domain_parameter_seed[domain_parameter_seed.Length - 1] &= mask;
-            }
+                byte[] u;
+                using (SHA1Managed sha1 = new SHA1Managed())
+                {
+                    byte[] hashedSeed = sha1.ComputeHash(seed);
+                    BigInteger tmp = seed.CreatePositiveBigInteger() + BigInteger.One;
+                    byte[] hashedMod = sha1.ComputeHash((tmp % outlenPow).ToByteArray());
 
-            domain_parameter_seed[domain_parameter_seed.Length - 1] |= (byte)(1 << (remainingBits > 0 ? remainingBits : 7));
+                    u = hashedSeed.Xor(hashedMod);
+                }
 
-            //set last bit of domain parameter seed to 1
+                // set the least and most significant bit to 1
+                u[0] |= 1;
+                u[u.Length - 1] |= (byte)(1 << 7);
 
-            byte[] hashedDomain;
-            byte[] hashedMod;
+                q = u.CreatePositiveBigInteger();
 
-            byte[] Utmp;
-            using (SHA1Managed sha1 = new SHA1Managed())
-            {
-                hashedDomain = sha1.ComputeHash(domain_parameter_seed);
-                byte[] domain_parameter_seed_with_zero = new byte[domain_parameter_seed.Length + 1];
-                domain_parameter_seed.CopyTo(domain_parameter_seed_with_zero, 0);
-                BigInteger temporary = new BigInteger(domain_parameter_seed_with_zero) + BigInteger.One;
-                hashedMod = sha1.ComputeHash((temporary % outlenPow).ToByteArray());
+            } while (_primalityTester.CheckPrimality(q));
 
-                Utmp =hashedDomain.Xor(hashedMod);
-            }
-
-            Utmp[0] |= 1;
-            Utmp[Utmp.Length - 1] |= (byte)(1 << 7);
-            byte[] U = new byte[Utmp.Length + 1];
-            Utmp.CopyTo(U, 0);
-
-            q = new BigInteger(U);
             return q;
         }
 
-        private static BigInteger SetP(int L, int outlen, BigInteger outlenPow, int n, int b, byte[] domain_parameter_seed, BigInteger q, ref int counter, ref int offset)
+        private BigInteger GenerateP(int L, int outlen, BigInteger outlenPow, int n, int b, byte[] seed, BigInteger q, ref int offset)
         {
             BigInteger[] V = new BigInteger[n + 1];
-
 
             for (int j = 0; j <= n; j++)
             {
                 using (SHA1Managed sha1 = new SHA1Managed())
                 {
-                    BigInteger temp = new BigInteger(domain_parameter_seed) + new BigInteger(offset) + new BigInteger(j);
-                    V[j] = new BigInteger(sha1.ComputeHash((temp % outlenPow).ToByteArray()));
+                    BigInteger tmp = seed.CreatePositiveBigInteger() + offset + j;
+                    V[j] = new BigInteger(sha1.ComputeHash((tmp % outlenPow).ToByteArray()));
                 }
             }
 
@@ -173,9 +145,45 @@ namespace DSAAlgorythm.Services
 
             BigInteger X = W + BigInteger.Pow(2, L - 1);
 
-            BigInteger c = X % (new BigInteger(2) * q);
+            BigInteger c = X % (q * 2);
 
             return (X - (c - 1));
+        }
+
+        private void UpdateControlVariables(int n, ref bool outerLoop, ref bool innerLoop, ref int counter, ref int offset)
+        {
+            counter++;
+            offset += (n + 1);
+            if (counter == 4096)
+            {
+                outerLoop = true;
+                innerLoop = false;
+            }
+            else
+            {
+                outerLoop = false;
+                innerLoop = true;
+            }
+        }
+
+        private BigInteger GenerateG(BigInteger p, BigInteger q)
+        {
+            BigInteger a = new BigInteger();
+            for (BigInteger h = 2; h < q; h++)
+            {
+                BigInteger exponent = (p - 1) / q;
+                a = BigInteger.ModPow(h, exponent, p);
+                if (a != 1)
+                {
+                    break;
+                }
+            }
+            return a;
+        }
+
+        private bool CheckLengthCombinations(int l, int n)
+        {
+            return l == 1024 && n == 160;
         }
     }
 }
