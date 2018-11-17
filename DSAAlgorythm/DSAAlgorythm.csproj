@@ -42,13 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BigInt.cs" />
-    <Compile Include="DoubleWordsCollection.cs" />
-    <Compile Include="DoubleWordsListExtensions.cs" />
+    <Compile Include="BigInteger.cs" />
+    <Compile Include="Data\IDataProvider.cs" />
+    <Compile Include="Data\TextDataProvider.cs" />
     <Compile Include="DSAAlgorythm.cs" />
     <Compile Include="Model\DsaSystemParameters.cs" />
     <Compile Include="Services\DsaParametersGenerator.cs" />
     <Compile Include="ExtensionMethods\ByteArrayExtension.cs" />
+    <Compile Include="Hasher.cs" />
+    <Compile Include="Helpers\TextUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\MillerRabinPrimalityTester.cs" />
     <Compile Include="Services\Interface\IPrimalityTester.cs" />

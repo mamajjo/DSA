@@ -8,9 +8,9 @@ namespace DSAAlgorythm
 {
     public class Signature
     {
-        public BigInt R { get; set; }
-        public BigInt S { get; set; }
-        public Signature(BigInt r, BigInt s)
+        public BigInteger R { get; set; }
+        public BigInteger S { get; set; }
+        public Signature(BigInteger r, BigInteger s)
         {
             R = r;
             S = s;
