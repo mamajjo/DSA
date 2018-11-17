@@ -9,7 +9,6 @@ namespace DSAAlgorythm.Services
 {
     public class DsaParametersGenerator
     {
-        private static readonly RNGCryptoServiceProvider RndProvider = new RNGCryptoServiceProvider();
         private readonly IPrimalityTester _primalityTester = new MillerRabinPrimalityTester(40);
 
         public DsaSystemParameters GenerateParameters(int L, int N, int seedLen)
@@ -85,7 +84,7 @@ namespace DSAAlgorythm.Services
             BigInteger q;
             do
             {
-                RndProvider.GetBytes(seed);
+                CryptoRandomNumberProvider.RndProvider.GetBytes(seed);
 
                 // turn off additional bits and set the most significant bit to 1
                 if (remainingBits > 0)
