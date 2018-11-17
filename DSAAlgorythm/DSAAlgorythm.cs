@@ -1,4 +1,4 @@
-﻿using DSAAlgorythm.Data;
+using DSAAlgorythm.Data;
 using System;
 using System.Security.Cryptography;
 using static DSAAlgorythm.Hasher;
