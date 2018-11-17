@@ -28,7 +28,7 @@ namespace DSAAlgorythm.Services
             {
                 CryptoRandomNumberProvider.RndProvider.GetBytes(random);
                 x = new BigInteger(random) % q;
-            } while (x != BigInteger.Zero);
+            } while (x == BigInteger.Zero);
 
             BigInteger y = BigInteger.ModPow(_systemParameters.G, x, _systemParameters.P);
 

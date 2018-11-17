@@ -1,6 +1,4 @@
-﻿using System;
-using System.Numerics;
-using DSAAlgorythm;
+﻿using System.Numerics;
 using DSAAlgorythm.Model;
 using DSAAlgorythm.Services;
 using FluentAssertions;
@@ -22,7 +20,7 @@ namespace DsaAlgorithmTests
         [TestMethod]
         public void When_GenerateParameters_Should_ReturnCorrectValues()
         {
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 5; i++)
             {
                 DsaSystemParameters parameters = _generator.GenerateParameters(1024, 160, 160);
                 //p - 1 is a multiple of q

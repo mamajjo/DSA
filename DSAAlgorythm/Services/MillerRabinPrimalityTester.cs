@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Security.Cryptography;
 using DSAAlgorythm.Services.Interface;
 
 namespace DSAAlgorythm.Services
@@ -30,11 +29,9 @@ namespace DSAAlgorythm.Services
                 s += 1;
             }
 
-            int bytesLength = p.ToByteArray().Length;
-
             for (int i = 0; i < _confidence; i++)
             {
-                BigInteger a = GenerateRandomNumber(2, p - 1, bytesLength);
+                BigInteger a = CryptoRandomNumberProvider.GenerateRandomBigInteger(2, p - 1);
 
                 BigInteger x = BigInteger.ModPow(a, pSub1, p);
                 if (x == 1 || x == p - 1)
@@ -54,22 +51,6 @@ namespace DSAAlgorythm.Services
             }
 
             return true;
-        }
-
-        private BigInteger GenerateRandomNumber(BigInteger lowerBound, BigInteger upperBound, int bytesLength)
-        {
-            RandomNumberGenerator rng = RandomNumberGenerator.Create();
-            BigInteger a;
-            byte[] bytes = new byte[bytesLength];
-
-            do
-            {
-                rng.GetBytes(bytes);
-                a = new BigInteger(bytes);
-            }
-            while (a < lowerBound || a > upperBound);
-
-            return a;
         }
     }
 }

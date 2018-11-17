@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Security.Cryptography;
 
 namespace DSAAlgorythm.Model
 {
@@ -8,6 +9,7 @@ namespace DSAAlgorythm.Model
         public BigInteger P { get; }
         public BigInteger Q { get; }
         public BigInteger G { get; }
+        public Hasher HashFunction { get; set; }
 
         public DsaSystemParameters(BigInteger p, BigInteger q, BigInteger g)
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.ComponentModel;
 
 namespace DSAAlgorythm
@@ -12,57 +7,57 @@ namespace DSAAlgorythm
     {
         public enum HashImplementation
         {
-            [Description("MD5")]
-            md5,
+            [Description("MD5")] Md5,
 
-            [Description("SHA256")]
-            sha256,
+            [Description("SHA-1")] Sha1,
 
-            [Description("SHA515")]
-            sha512
+            [Description("SHA256")] Sha256,
+
+            [Description("SHA515")] Sha512
         }
-      //  public byte[] Message { get; set; }
-        private HashAlgorithm HashAlgorithm { get; set; }
-        private HashImplementation hashImplementation;
-        public Hasher(HashImplementation _hashImplementation)
+
+        private HashImplementation _hashImplementation;
+
+        public Hasher(HashImplementation hashImplementation)
         {
-            hashImplementation = _hashImplementation;
+            _hashImplementation = hashImplementation;
         }
 
         public byte[] GetHashedMessage(byte[] message)
         {
-            switch (hashImplementation)
+            switch (_hashImplementation)
             {
-                case HashImplementation.md5:
+                case HashImplementation.Sha1:
+                {
+                    using (SHA1Managed sha1 = new SHA1Managed())
                     {
-                        using (MD5 md5Hash = MD5.Create())
-                        {
-                            byte[] hash = md5Hash.ComputeHash(message);
-                            return hash;
-
-                            
-                        }
+                        return sha1.ComputeHash(message);
                     }
-                case HashImplementation.sha256:
+                }
+                case HashImplementation.Md5:
+                {
+                    using (MD5 md5Hash = MD5.Create())
                     {
-                        using (SHA256 md5Hash = SHA256.Create())
-                        {
-                            byte[] hash = md5Hash.ComputeHash(message);
-                            return hash;
-
-
-                        }
+                        byte[] hash = md5Hash.ComputeHash(message);
+                        return hash;
                     }
-                case HashImplementation.sha512:
+                }
+                case HashImplementation.Sha256:
+                {
+                    using (SHA256 md5Hash = SHA256.Create())
                     {
-                        using (SHA512 md5Hash = SHA512.Create())
-                        {
-                            byte[] hash = md5Hash.ComputeHash(message);
-                            return hash;
-
-
-                        }
+                        byte[] hash = md5Hash.ComputeHash(message);
+                        return hash;
                     }
+                }
+                case HashImplementation.Sha512:
+                {
+                    using (SHA512 md5Hash = SHA512.Create())
+                    {
+                        byte[] hash = md5Hash.ComputeHash(message);
+                        return hash;
+                    }
+                }
                 default: return null;
             }
         }

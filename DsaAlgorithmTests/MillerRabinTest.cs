@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using DSAAlgorythm.Services;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,7 +23,5 @@ namespace DsaAlgorithmTests
             _primalityTester.CheckPrimality(BigInteger.Parse("1298074214633706835075030044377087")).Should().BeTrue();
             _primalityTester.CheckPrimality(BigInteger.Parse("1298074214633706835075030044377089")).Should().BeFalse();
         }
-
-
     }
 }

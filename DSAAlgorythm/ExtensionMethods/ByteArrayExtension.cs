@@ -20,6 +20,9 @@ namespace DSAAlgorythm.ExtensionMethods
             return xorResult;
         }
 
+        // big integers requires for constructor an array of bytes in little endian 
+        // when most significant bit is 1, number is negative
+        // to prevent default behaviour when most significant bit is 1, add additional zero byte 0x00 to the end
         public static BigInteger CreatePositiveBigInteger(this byte[] data)
         {
             int byteCount = data.Length;

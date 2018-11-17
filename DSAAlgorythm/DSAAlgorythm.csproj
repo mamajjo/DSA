@@ -42,10 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BigInt.cs" />
-    <Compile Include="DoubleWordsCollection.cs" />
-    <Compile Include="DoubleWordsListExtensions.cs" />
+    <Compile Include="Data\IDataProvider.cs" />
+    <Compile Include="Data\TextDataProvider.cs" />
+    <Compile Include="DsaAlgorithm.cs" />
     <Compile Include="DSAAlgorythm.cs" />
+    <Compile Include="Hasher.cs" />
+    <Compile Include="Helpers\TextUtility.cs" />
     <Compile Include="Model\DsaSystemParameters.cs" />
     <Compile Include="Model\UserKeyPair.cs" />
     <Compile Include="Services\CryptoRandomNumberProvider.cs" />
@@ -57,8 +59,6 @@
     <Compile Include="Services\UserKeyGenerator.cs" />
     <Compile Include="Signature.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Algorythms\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
