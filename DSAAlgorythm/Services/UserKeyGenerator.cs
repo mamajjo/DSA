@@ -24,11 +24,9 @@ namespace DSAAlgorythm.Services
             int byteLength = q.ToByteArray().Length;
             byte[] random = new byte[byteLength];
             BigInteger x;
-            do
-            {
-                CryptoRandomNumberProvider.RndProvider.GetBytes(random);
-                x = new BigInteger(random) % q;
-            } while (x == BigInteger.Zero);
+
+            CryptoRandomNumberProvider.RndProvider.GetBytes(random);
+            x = (BigInteger.Abs((new BigInteger(random))  % (q - 1)) + 1);
 
             BigInteger y = BigInteger.ModPow(_systemParameters.G, x, _systemParameters.P);
 

@@ -19,19 +19,27 @@ namespace DSAAlgorythm
 
         public Signature Sign(byte[] message, BigInteger privateKey)
         {
-            BigInteger k = CryptoRandomNumberProvider.GenerateRandomBigInteger(1, Parameters.Q);
+            BigInteger k;
+            BigInteger r;
+            BigInteger s;
+            do
+            {
+                do
+                {
+                    k = CryptoRandomNumberProvider.GenerateRandomBigInteger(1, Parameters.Q);
+                    // compute first part of signature
+                    r = BigInteger.ModPow(Parameters.G, k, Parameters.P) % Parameters.Q;
+                } while (r == 0);
 
-            // compute first part of signature
-            BigInteger r = BigInteger.ModPow(Parameters.G, k, Parameters.P) % Parameters.Q;
 
-            // assuming that p is prime -> k and p are coprime; we can use Euler's theorem to calculate inverse k
-            // https://en.wikipedia.org/wiki/Modular_multiplicative_inverse -> Using Euler's theorem
-            BigInteger kInverse = BigInteger.ModPow(k, Parameters.P - 2, Parameters.P);
+                // assuming that p is prime -> k and p are coprime; we can use Euler's theorem to calculate inverse k
+                // https://en.wikipedia.org/wiki/Modular_multiplicative_inverse -> Using Euler's theorem
+                BigInteger kInverse = BigInteger.ModPow(k, Parameters.Q - 2, Parameters.Q);
 
-            //compute second part of signature
-            BigInteger hashedMessage = Parameters.HashFunction.GetHashedMessage(message).CreatePositiveBigInteger();
-            BigInteger s = (kInverse * (hashedMessage + privateKey * r)) % Parameters.Q;
-
+                //compute second part of signature
+                BigInteger hashedMessage = Parameters.HashFunction.GetHashedMessage(message).CreatePositiveBigInteger();
+                s = (kInverse * (hashedMessage + (privateKey * r))) % Parameters.Q;
+            } while (s == 0);
             return new Signature(r, s);
         }
 
@@ -57,11 +65,11 @@ namespace DSAAlgorythm
             
             // calculate v factor
             // (A * B) mod C = (A mod C * B mod C) mod C
-            // (g^u1 * y^u2) % p ) % g
+            // (g^u1 * y^u2) % p ) % q
             BigInteger firstExp = BigInteger.ModPow(Parameters.G, u1, Parameters.P);
             BigInteger secondExp = BigInteger.ModPow(publicKey, u2, Parameters.P);
            
-            BigInteger v = ((firstExp * secondExp) % Parameters.P) % Parameters.G;
+            BigInteger v = ((firstExp * secondExp) % Parameters.P) % Parameters.Q;
             if (v == signature.R)
             {
                 return true;
