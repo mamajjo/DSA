@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 
 namespace DSAAlgorythm.ExtensionMethods
@@ -33,6 +34,14 @@ namespace DSAAlgorythm.ExtensionMethods
             byte[] positive = new byte[byteCount + 1];
             data.CopyTo(positive, 0);
             return new BigInteger(positive);
+        }
+
+        public static byte[] ToThinnedByteArray(this BigInteger data)
+        {
+            var bytes = data.ToByteArray();
+
+            if (bytes.Last() == 0) return bytes.Take(bytes.Length - 1).ToArray();
+            return bytes;
         }
     }
 }

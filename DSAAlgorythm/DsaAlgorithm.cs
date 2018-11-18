@@ -70,14 +70,8 @@ namespace DSAAlgorythm
             BigInteger secondExp = BigInteger.ModPow(publicKey, u2, Parameters.P);
            
             BigInteger v = ((firstExp * secondExp) % Parameters.P) % Parameters.Q;
-            if (v == signature.R)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return v == signature.R;
         }
 
 
