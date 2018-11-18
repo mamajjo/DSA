@@ -15,7 +15,7 @@ namespace DSAAlgorythm.Services
 
         public UserKeyGenerator(DsaSystemParameters systemParameters)
         {
-            SystemParameters = systemParameters ?? throw new ArgumentNullException(nameof(systemParameters));
+            SystemParameters = systemParameters;
         }
 
         public UserKeyPair GenerateKeyPair()
