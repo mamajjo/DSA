@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\FileDataProvider.cs" />
     <Compile Include="Data\IDataProvider.cs" />
     <Compile Include="Data\TextDataProvider.cs" />
     <Compile Include="DsaAlgorithm.cs" />

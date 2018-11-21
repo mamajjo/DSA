@@ -23,6 +23,7 @@ namespace DSAGUI
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new ViewModel();
         }
     }
 }
