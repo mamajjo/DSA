@@ -22,6 +22,11 @@ namespace DSAAlgorythm
         {
             _hashImplementation = hashImplementation;
         }
+        /// <summary>
+        /// Allows to define what type of hash method is going to be used in algorithm. Default: MD5
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
 
         public byte[] GetHashedMessage(byte[] message)
         {
@@ -58,7 +63,14 @@ namespace DSAAlgorythm
                         return hash;
                     }
                 }
-                default: return null;
+                default:
+                    {
+                        using (MD5 md5Hash = MD5.Create())
+                        {
+                            byte[] hash = md5Hash.ComputeHash(message);
+                            return hash;
+                        }
+                    }
             }
         }
     }

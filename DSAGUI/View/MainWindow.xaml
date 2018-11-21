@@ -18,12 +18,16 @@
         </Grid.ColumnDefinitions>
         <!-- First -->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin=" 10, 10 ,10 ,10">Signing</TextBlock>
-        <Button Name="FileGetterButton" Width="100" Height="40" Grid.Column="0" Grid.Row="0" Margin="10, 36, 10, 0" Command="{Binding SelectFileToSign}">Explore Files</Button>
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="10, 36, 10, 0">
+            <Button  MaxWidth="200" Height="40" Margin="0,10,0,0" Command="{Binding GenerateDomainParameters}">Generate Domain Parameters</Button>
+            <Button  MaxWidth="200" Height="40" Margin="0,10,0,0" Command="{Binding GenerateKeyPair}">Generate Users Keys</Button>
+            <Button  MaxWidth="200" Height="40" Margin="0,10,0,0" Command="{Binding SelectFileToSignCommand}">Explore Files</Button>
+        </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center">
             <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin=" 10, 10 ,10 ,10">Pick a file to sign</TextBlock>
             <TextBox Text="{Binding FileToSignPath}" Height="40"  MinWidth="200"  Margin="10, 0, 10, 0" VerticalAlignment="Center" ></TextBox>
         </StackPanel>
-        <Button Width="100" Height="40" Grid.Column="2" Grid.Row="0" Margin="10, 36, 10, 0" HorizontalAlignment="Left" Command="">Sign!</Button>
+        <Button Width="100" Height="40" Grid.Column="2" Grid.Row="0" Margin="10, 36, 10, 0" HorizontalAlignment="Left" Command="{Binding SignFile}">Sign!</Button>
         
         <!-- Next Row-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" Margin=" 10, 10 ,10 ,10">Veryfing</TextBlock>

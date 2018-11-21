@@ -24,7 +24,7 @@ namespace DsaAlgorithmTests
             UserKeyGenerator keyGen = new UserKeyGenerator(_dsaParameters);
             _keyPair = keyGen.GenerateKeyPair();
 
-            _dsaAlgorithm = new DsaAlgorithm {Parameters = _dsaParameters};
+            _dsaAlgorithm = new DsaAlgorithm(_dsaParameters);
         }
 
 

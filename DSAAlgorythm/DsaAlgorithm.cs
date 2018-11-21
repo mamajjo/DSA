@@ -17,6 +17,11 @@ namespace DSAAlgorythm
             set => _systemParameters = value ?? throw new ArgumentNullException(nameof(DsaSystemParameters));
         }
 
+        public DsaAlgorithm(DsaSystemParameters dsaSystemParameters)
+        {
+            Parameters = dsaSystemParameters;
+        }
+
         public Signature Sign(byte[] message, BigInteger privateKey)
         {
             BigInteger k;

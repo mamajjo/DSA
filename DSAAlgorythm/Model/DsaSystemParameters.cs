@@ -16,6 +16,7 @@ namespace DSAAlgorythm.Model
             P = p;
             Q = q;
             G = g;
+            HashFunction = new Hasher(Hasher.HashImplementation.Md5);
         }
     }
 }

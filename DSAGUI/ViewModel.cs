@@ -10,6 +10,9 @@ using DSAAlgorythm.Services;
 using Microsoft.Win32;
 using DSAGUI;
 using WPFGUI;
+using DSAAlgorythm.Data;
+using DSAAlgorythm;
+
 
 namespace DSAGUI
 {
@@ -30,25 +33,35 @@ namespace DSAGUI
 
         public ICommand SignFile { get; set; }
 
-        public ViewModel()
-        {
-            _keyGenerator = new UserKeyGenerator(DomainParameters);
+        private IDataProvider _dataProvider;
+        public DsaAlgorithm Algorithm { get; set; }
 
+        public ViewModel()
+        { //TODO initialize DomainParameters
+            //DomainParameters = _dsaParametersGenerator.GenerateParameters(1024, 160, 160);
             GenerateDomainParameters = new RelayCommand(() =>
             {
-                _dsaParametersGenerator.GenerateParameters(1024, 160, 160);
+                DomainParameters = _dsaParametersGenerator.GenerateParameters(1024, 160, 160);
                 (GenerateKeyPair as RelayCommand).RaiseCanExecuteChanged();
+                _keyGenerator = new UserKeyGenerator(DomainParameters);
             });
+
 
             GenerateKeyPair = new RelayCommand(() =>
             {
                 _keyGenerator.SystemParameters = DomainParameters;
-                _keyGenerator.GenerateKeyPair();
+                KeyPair = _keyGenerator.GenerateKeyPair();
             }, () => DomainParameters != null );
+
+            // TO DO iniialize instantion of DSA ALgorithm
+            //DomainParameters.HashFunction = new Hasher(Hasher.HashImplementation.Md5);
+            //_algorythym = new DsaAlgorithm(DomainParameters);
 
             SelectFileToSignCommand = new RelayCommand(SelectFileToSign);
             SelectFileToVerifyCommand = new RelayCommand(SelectFileToVerify);
-            SignFile = new RelayCommand(() => { File.Open(FileToSignPath, FileMode.Open); }); //todo
+            SignFile = new RelayCommand(SigningFile);
+            //SignFile = new RelayCommand(() => { File.Open(FileToSignPath, FileMode.Open); }); //todo
+
 
         }
 
@@ -73,6 +86,7 @@ namespace DSAGUI
             set
             {
                 SetProperty(ref _fileToSignPath, value);
+                _dataProvider = new FileDataProvider(_fileToSignPath);
             }
         }
 
@@ -95,10 +109,18 @@ namespace DSAGUI
             set
             {
                 SetProperty(ref _fileToSignPath, value);
+                // TODO add blocking bad user's behaviour SelectFileToSignCommand.RaiseCanExecuteChanged();
             }
         }
 
-
+        public RelayCommand SigningFileCommand { get; set; }
         #endregion
+        private void SigningFile()
+        {
+            Algorithm = new DsaAlgorithm(DomainParameters);
+            var bytesToSign = _dataProvider.GetData();
+            Signature signature = Algorithm.Sign(bytesToSign, KeyPair.PrivateKey);
+            signature.ToBinaryStringFile();
+        }
     }
 }
