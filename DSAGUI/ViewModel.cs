@@ -26,15 +26,26 @@ namespace DSAGUI
         public UserKeyPair KeyPair { get; set; }
 
         public DsaSystemParameters DomainParameters { get; set; }
+        public DsaAlgorithm Algorithm { get; set; }
+
+        private Signature _signatureToSign;
+
+        private Signature _signatureToVerify;
+        private bool _isTheSameFile;
+
+        public bool IsTheSameFile
+        {
+            get { return _isTheSameFile; }
+            set { _isTheSameFile = value; }
+        }
+
 
         public ICommand GenerateDomainParameters { get; set; }
 
         public ICommand GenerateKeyPair { get; set; }
 
-        public ICommand SignFile { get; set; }
-
         private IDataProvider _dataProvider;
-        public DsaAlgorithm Algorithm { get; set; }
+
 
         public ViewModel()
         { //TODO initialize DomainParameters
@@ -51,6 +62,7 @@ namespace DSAGUI
             {
                 _keyGenerator.SystemParameters = DomainParameters;
                 KeyPair = _keyGenerator.GenerateKeyPair();
+                Algorithm = new DsaAlgorithm(DomainParameters);
             }, () => DomainParameters != null );
 
             // TO DO iniialize instantion of DSA ALgorithm
@@ -59,8 +71,9 @@ namespace DSAGUI
 
             SelectFileToSignCommand = new RelayCommand(SelectFileToSign);
             SelectFileToVerifyCommand = new RelayCommand(SelectFileToVerify);
-            SignFile = new RelayCommand(SigningFile);
-            //SignFile = new RelayCommand(() => { File.Open(FileToSignPath, FileMode.Open); }); //todo
+            SignFileCommand = new RelayCommand(SigningFile);
+            SignToVerifyCommand = new RelayCommand(SelectSignToVerifyFile);
+            VerifyFileCommand = new RelayCommand(VerifyFile);
 
 
         }
@@ -78,6 +91,9 @@ namespace DSAGUI
             }
         }
 
+        public byte[] SigningData { get; set; }
+        public byte[] VerifyingData { get; set; }
+
         private string _fileToSignPath;
 
         public string FileToSignPath
@@ -87,6 +103,7 @@ namespace DSAGUI
             {
                 SetProperty(ref _fileToSignPath, value);
                 _dataProvider = new FileDataProvider(_fileToSignPath);
+                SigningData = _dataProvider.GetData();
             }
         }
 
@@ -108,19 +125,52 @@ namespace DSAGUI
             get => _fileToVerifyPath;
             set
             {
-                SetProperty(ref _fileToSignPath, value);
+                SetProperty(ref _fileToVerifyPath, value);
+                _dataProvider = new FileDataProvider(_fileToVerifyPath);
+                VerifyingData = _dataProvider.GetData();
                 // TODO add blocking bad user's behaviour SelectFileToSignCommand.RaiseCanExecuteChanged();
             }
         }
+        private string _signToVerifyPath;
+        public string VerifyingSignFilePath
+        {
+            get => _signToVerifyPath;
+            set
+            {
+                SetProperty(ref _signToVerifyPath, value);
+                //_dataProvider = new FileDataProvider(_signToVerifyPath);
+            }
+        }
 
-        public RelayCommand SigningFileCommand { get; set; }
+        public RelayCommand SignToVerifyCommand { get; set; }
+
+        private void SelectSignToVerifyFile()
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Title = "Select sign to verify file";
+            if (fileDialog.ShowDialog() == true)
+            {
+                VerifyingSignFilePath = fileDialog.FileName;
+            }
+        }
         #endregion
+        public ICommand SignFileCommand { get; set; }
+
         private void SigningFile()
         {
-            Algorithm = new DsaAlgorithm(DomainParameters);
-            var bytesToSign = _dataProvider.GetData();
-            Signature signature = Algorithm.Sign(bytesToSign, KeyPair.PrivateKey);
-            signature.ToBinaryStringFile();
+
+            //var bytesToSign = _dataProvider.GetData();
+            _signatureToSign = Algorithm.Sign(SigningData, KeyPair.PrivateKey);
+            _signatureToSign.ToBinaryStringFile();
+        }
+
+        public RelayCommand VerifyFileCommand { get; set; }
+
+        private void VerifyFile()
+        {
+            _signatureToVerify = _signatureToSign.FromBinaryString(VerifyingSignFilePath);
+            IsTheSameFile = Algorithm.Verify(VerifyingData, _signatureToVerify, KeyPair.PublicKey);
+            Console.WriteLine("");
         }
     }
 }

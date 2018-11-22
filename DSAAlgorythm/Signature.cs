@@ -18,22 +18,30 @@ namespace DSAAlgorythm
         //https://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
         public void ToBinaryStringFile()
         {
-            var s = new StringBuilder();
-            s.Append(Encoding.ASCII.GetBytes(R.ToString()));
-            s.Append("\n");
-            s.Append(Encoding.ASCII.GetBytes(R.ToString()));
-            string s1 = s.ToString();
-            FileSaver.SaveTextToFile(s.ToString());
+            StringBuilder sb = new StringBuilder();
+            byte[] Rarray = R.ToByteArray();
+            foreach (byte item in Rarray)
+            {
+                sb.Append(item + " ");
+            }
+            byte[] Sarray = S.ToByteArray();
+            sb.Append("-");
+            foreach (byte item in Sarray)
+            {
+                sb.Append(item + " ");
+            }
+            FileSaver.SaveTextToFile(sb.ToString());
            
             //saving Signature
             // TODO save it to txt and save to fileSystem
         }
 
-        public static Signature FromBinaryString(string s)
+        public Signature FromBinaryString(string path)
         {
-            var enterPosition = s.IndexOf("\n");
+            string s = FileSaver.ReadTextToStrign(path);
+            var enterPosition = s.IndexOf("-");
             var rPartOfString = s.Substring(0, enterPosition);
-            var sPartOfString = s.Substring(enterPosition + 1, s.Length - enterPosition);
+            var sPartOfString = s.Substring(enterPosition + 1);
             BigInteger rFromFile = new BigInteger(rPartOfString.ToByteArray());
             BigInteger sFromFile = new BigInteger(sPartOfString.ToByteArray());
 

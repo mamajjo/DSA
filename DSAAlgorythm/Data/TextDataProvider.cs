@@ -17,5 +17,10 @@ namespace DSAAlgorythm.Data
         {
             return Message.ToByteArray(Encoding);
         }
+
+        public string GetStringData()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

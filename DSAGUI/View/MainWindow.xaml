@@ -27,18 +27,19 @@
             <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin=" 10, 10 ,10 ,10">Pick a file to sign</TextBlock>
             <TextBox Text="{Binding FileToSignPath}" Height="40"  MinWidth="200"  Margin="10, 0, 10, 0" VerticalAlignment="Center" ></TextBox>
         </StackPanel>
-        <Button Width="100" Height="40" Grid.Column="2" Grid.Row="0" Margin="10, 36, 10, 0" HorizontalAlignment="Left" Command="{Binding SignFile}">Sign!</Button>
+        <Button Width="100" Height="40" Grid.Column="2" Grid.Row="0" Margin="10, 36, 10, 0" HorizontalAlignment="Left" Command="{Binding SignFileCommand}">Sign!</Button>
         
         <!-- Next Row-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" Margin=" 10, 10 ,10 ,10">Veryfing</TextBlock>
-        <Button Width="100" Height="40" Grid.Column="0" Grid.Row="1" Margin="10, 36, 10, 0">Explore Files</Button>
+        <Button Width="100" Height="40" Grid.Column="0" Grid.Row="1" Margin="10, 36, 10, 0" Command="{Binding SelectFileToVerifyCommand}">Explore Files</Button>
         <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Center">
             <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin=" 10, 10 ,10 ,10">Pick a file which you want to verify with following singnature</TextBlock>
             <TextBox Text="{Binding FileToVerifyPath}" Height="40"  MinWidth="200"  Margin="10, 0, 10, 0" VerticalAlignment="Center" ></TextBox>
         </StackPanel>
         <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Vertical" VerticalAlignment="Center">
-            <Button Width="100" Height="40" Grid.Column="0" Grid.Row="1" Margin="10, -15, 10, 0" HorizontalAlignment="Left">Choose Signature</Button>
-            <TextBox Text="{Binding SignatureFilePath}" Height="40"  MinWidth="200"  Margin="10, 10, 10, 0" VerticalAlignment="Center" ></TextBox>
+            <Button Width="100" Height="40"  Margin="10, -15, 10, 0" HorizontalAlignment="Left" Command="{Binding SignToVerifyCommand}">Choose Signature</Button>
+            <TextBox Text="{Binding VerifyingSignFilePath}" Height="40"  MinWidth="200"  Margin="10, 10, 10, 0" VerticalAlignment="Center" ></TextBox>
+            <Button Width="100" Height="40"  Margin="10, 10, 10, 0" HorizontalAlignment="Left" Command="{Binding VerifyFileCommand}">Verify!</Button>
         </StackPanel>
     </Grid>
 </Window>
