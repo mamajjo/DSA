@@ -12,7 +12,7 @@ using DSAGUI;
 using WPFGUI;
 using DSAAlgorythm.Data;
 using DSAAlgorythm;
-
+using System.Windows;
 
 namespace DSAGUI
 {
@@ -168,8 +168,23 @@ namespace DSAGUI
 
         private void VerifyFile()
         {
-            _signatureToVerify = _signatureToSign.FromBinaryString(VerifyingSignFilePath);
-            IsTheSameFile = Algorithm.Verify(VerifyingData, _signatureToVerify, KeyPair.PublicKey);
+            try
+            {
+                _signatureToVerify = _signatureToSign.FromBinaryString(VerifyingSignFilePath);
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("Podano głupi plik");
+            }
+            if( IsTheSameFile = Algorithm.Verify(VerifyingData, _signatureToVerify, KeyPair.PublicKey))
+            {
+                MessageBox.Show("File Succesfully verified");
+            }
+            else
+            {
+                MessageBox.Show("File is not original, Caution!");
+            }
             Console.WriteLine("");
         }
     }
