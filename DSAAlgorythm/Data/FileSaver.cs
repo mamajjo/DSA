@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows;
 using Microsoft.Win32;
 
 namespace DSAAlgorythm.Data
@@ -15,8 +16,9 @@ namespace DSAAlgorythm.Data
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Text File|*.txt";
             saveFileDialog.Title = "Create or choose sign file";
-             saveFileDialog.ShowDialog();
-            if (!File.Exists(saveFileDialog.FileName))
+            saveFileDialog.ShowDialog();
+
+            try
             {
                 System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
                 using (StreamWriter sw = new StreamWriter(fs))
@@ -25,23 +27,18 @@ namespace DSAAlgorythm.Data
                     Console.WriteLine("");
                 }
             }
-            else if (File.Exists(saveFileDialog.FileName)) ;
+            catch (Exception e)
             {
-                System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    sw.Write(text);
-                    Console.WriteLine("");
-                }
+                MessageBox.Show(e.Message, "Error");
             }
-            //switch (saveFileDialog.FilterIndex)
+            //else if (File.Exists(saveFileDialog.FileName))
             //{
-            //    case 1:
-                    
-            //        //File.Write(saveFileDialog.FileName);
-            //        //TextWriter tw = new StreamWriter(saveFileDialog.FileName);
-            //        //tw.WriteLine(text);
-            //        //break;
+            //    System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
+            //    using (StreamWriter sw = new StreamWriter(fs))
+            //    {
+            //        sw.Write(text);
+            //        Console.WriteLine("");
+            //    }
             //}
         }
         public static string ReadTextToStrign(string filePath)

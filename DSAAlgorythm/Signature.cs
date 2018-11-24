@@ -36,7 +36,7 @@ namespace DSAAlgorythm
             // TODO save it to txt and save to fileSystem
         }
 
-        public Signature FromBinaryString(string path)
+        public static Signature FromBinaryString(string path)
         {
             string s = FileSaver.ReadTextToStrign(path);
             var enterPosition = s.IndexOf("-");

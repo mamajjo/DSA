@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using DSAAlgorythm.Model;
 using DSAAlgorythm.Services;
@@ -23,7 +25,15 @@ namespace DSAGUI
 
         public string SignatureFilePath { get; set; }
 
-        public UserKeyPair KeyPair { get; set; }
+        private UserKeyPair _keyPair;
+        public UserKeyPair KeyPair
+        {
+            get => _keyPair;
+            set
+            {
+                SetProperty(ref _keyPair, value);
+            }
+        }
 
         public DsaSystemParameters DomainParameters { get; set; }
         public DsaAlgorithm Algorithm { get; set; }
@@ -40,20 +50,20 @@ namespace DSAGUI
         }
 
 
-        public ICommand GenerateDomainParameters { get; set; }
+        public RelayCommand GenerateDomainParameters { get; set; }
 
-        public ICommand GenerateKeyPair { get; set; }
+        public RelayCommand GenerateKeyPair { get; set; }
 
         private IDataProvider _dataProvider;
 
 
         public ViewModel()
-        { //TODO initialize DomainParameters
+        {
             //DomainParameters = _dsaParametersGenerator.GenerateParameters(1024, 160, 160);
             GenerateDomainParameters = new RelayCommand(() =>
             {
                 DomainParameters = _dsaParametersGenerator.GenerateParameters(1024, 160, 160);
-                (GenerateKeyPair as RelayCommand).RaiseCanExecuteChanged();
+                GenerateKeyPair.RaiseCanExecuteChanged();
                 _keyGenerator = new UserKeyGenerator(DomainParameters);
             });
 
@@ -62,6 +72,7 @@ namespace DSAGUI
             {
                 _keyGenerator.SystemParameters = DomainParameters;
                 KeyPair = _keyGenerator.GenerateKeyPair();
+                SignFileCommand.RaiseCanExecuteChanged();
                 Algorithm = new DsaAlgorithm(DomainParameters);
             }, () => DomainParameters != null );
 
@@ -71,7 +82,7 @@ namespace DSAGUI
 
             SelectFileToSignCommand = new RelayCommand(SelectFileToSign);
             SelectFileToVerifyCommand = new RelayCommand(SelectFileToVerify);
-            SignFileCommand = new RelayCommand(SigningFile);
+            SignFileCommand = new RelayCommand(SigningFile, () => _keyPair != null && SigningData != null );
             SignToVerifyCommand = new RelayCommand(SelectSignToVerifyFile);
             VerifyFileCommand = new RelayCommand(VerifyFile);
 
@@ -89,6 +100,8 @@ namespace DSAGUI
             {
                 FileToSignPath = fileDialog.FileName;
             }
+
+            SignFileCommand.RaiseCanExecuteChanged();
         }
 
         public byte[] SigningData { get; set; }
@@ -102,8 +115,15 @@ namespace DSAGUI
             set
             {
                 SetProperty(ref _fileToSignPath, value);
-                _dataProvider = new FileDataProvider(_fileToSignPath);
-                SigningData = _dataProvider.GetData();
+                try
+                {
+                    _dataProvider = new FileDataProvider(_fileToSignPath);
+                    SigningData = _dataProvider.GetData();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error!");
+                }
             }
         }
 
@@ -126,8 +146,15 @@ namespace DSAGUI
             set
             {
                 SetProperty(ref _fileToVerifyPath, value);
-                _dataProvider = new FileDataProvider(_fileToVerifyPath);
-                VerifyingData = _dataProvider.GetData();
+                try
+                {
+                    _dataProvider = new FileDataProvider(_fileToVerifyPath);
+                    VerifyingData = _dataProvider.GetData();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error!");
+                }
                 // TODO add blocking bad user's behaviour SelectFileToSignCommand.RaiseCanExecuteChanged();
             }
         }
@@ -154,23 +181,31 @@ namespace DSAGUI
             }
         }
         #endregion
-        public ICommand SignFileCommand { get; set; }
+        public RelayCommand SignFileCommand { get; set; }
 
         private void SigningFile()
         {
-
+            try
+            {
+                _signatureToSign = Algorithm.Sign(SigningData, KeyPair.PrivateKey);
+                _signatureToSign.ToBinaryStringFile();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error!");
+            }
             //var bytesToSign = _dataProvider.GetData();
-            _signatureToSign = Algorithm.Sign(SigningData, KeyPair.PrivateKey);
-            _signatureToSign.ToBinaryStringFile();
         }
 
         public RelayCommand VerifyFileCommand { get; set; }
 
         private void VerifyFile()
         {
-            _signatureToVerify = _signatureToSign.FromBinaryString(VerifyingSignFilePath);
+            if (KeyPair == null) KeyPair = new UserKeyPair(0, 0);
+
+            _signatureToVerify = Signature.FromBinaryString(VerifyingSignFilePath);
             IsTheSameFile = Algorithm.Verify(VerifyingData, _signatureToVerify, KeyPair.PublicKey);
-            Console.WriteLine("");
+            MessageBox.Show($"The document is signed {(IsTheSameFile ? "" : "in")}correctly", IsTheSameFile ? "CORRECT": "FALSE");
         }
     }
 }
