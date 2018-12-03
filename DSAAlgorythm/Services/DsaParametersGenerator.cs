@@ -103,7 +103,7 @@ namespace DSAAlgorythm.Services
                 {
                     byte[] hashedSeed = sha1.ComputeHash(seed);
                     BigInteger tmp = seed.CreatePositiveBigInteger() + BigInteger.One;
-                    byte[] hashedMod = sha1.ComputeHash((tmp % outlenPow).ToByteArray());
+                    byte[] hashedMod = sha1.ComputeHash((tmp % outlenPow).ToThinnedByteArray());
 
                     u = hashedSeed.Xor(hashedMod);
                 }
@@ -114,7 +114,7 @@ namespace DSAAlgorythm.Services
 
                 q = u.CreatePositiveBigInteger();
 
-            } while (_primalityTester.CheckPrimality(q));
+            } while (!_primalityTester.CheckPrimality(q));
 
             return q;
         }

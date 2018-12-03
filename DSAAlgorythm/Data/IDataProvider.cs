@@ -9,5 +9,6 @@ namespace DSAAlgorythm.Data
     public interface IDataProvider
     {
         byte[] GetData();
+        string GetStringData();
     }
 }

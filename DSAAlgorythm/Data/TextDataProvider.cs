@@ -1,4 +1,5 @@
-﻿using DSAAlgorythm.Helpers;
+﻿using System.Text;
+using DSAAlgorythm.Helpers;
 using static DSAAlgorythm.Helpers.TextUtility;
 
 namespace DSAAlgorythm.Data
@@ -6,7 +7,7 @@ namespace DSAAlgorythm.Data
     public class TextDataProvider: IDataProvider
     {
         public string Message { get; }
-        public Encoding Encoding { get; }
+        public TextUtility.Encoding Encoding { get; }
         public TextDataProvider(string message, TextUtility.Encoding encoding)
         {
             Message = message;
@@ -15,6 +16,11 @@ namespace DSAAlgorythm.Data
         public byte[] GetData()
         {
             return Message.ToByteArray(Encoding);
+        }
+
+        public string GetStringData()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
