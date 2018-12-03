@@ -48,7 +48,6 @@
     <Compile Include="Data\IDataProvider.cs" />
     <Compile Include="Data\TextDataProvider.cs" />
     <Compile Include="DsaAlgorithm.cs" />
-    <Compile Include="DSAAlgorythm.cs" />
     <Compile Include="ExtensionMethods\StringExtension.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="Helpers\TextUtility.cs" />
